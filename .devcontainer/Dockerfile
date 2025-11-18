@@ -71,6 +71,9 @@ RUN usermod -aG sudo node
 # 配置 sudoers 以允许 node 用户免密码 sudo（编辑 /etc/sudoers）
 RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# 阿里云镜像
+RUN npm config set registry https://registry.npmmirror.com
+
 # Set up non-root user
 USER node
 
