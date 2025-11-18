@@ -1,5 +1,13 @@
 FROM node:20
 
+# 替换为阿里云 Debian 12 源（支持 bookworm、bullseye、buster）
+RUN sed -i \
+    -e 's|http://deb.debian.org/debian|https://mirrors.aliyun.com/debian|g' \
+    -e 's|http://security.debian.org/debian-security|https://mirrors.aliyun.com/debian-security|g' \
+    -e 's|http://deb.debian.org/debian-security|https://mirrors.aliyun.com/debian-security|g' \
+    /etc/apt/sources.list.d/debian.sources \
+    && rm -f /etc/apt/sources.list.d/*.old 2>/dev/null || true
+
 ARG TZ
 ENV TZ="$TZ"
 
@@ -53,6 +61,15 @@ RUN ARCH=$(dpkg --print-architecture) && \
   wget "https://github.com/dandavison/delta/releases/download/${GIT_DELTA_VERSION}/git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
   sudo dpkg -i "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" && \
   rm "git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb"
+
+# 在 root 用户下安装 sudo 并配置（如果基础镜像未包含 sudo）
+USER root
+
+# 添加 node 用户到 sudo 组（如果未添加）
+RUN usermod -aG sudo node
+
+# 配置 sudoers 以允许 node 用户免密码 sudo（编辑 /etc/sudoers）
+RUN echo "node ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Set up non-root user
 USER node
