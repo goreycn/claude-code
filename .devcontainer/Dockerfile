@@ -36,7 +36,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   openjdk-17-jdk \
   maven \
   mariadb-client \
-  redis-tools \  
+  redis-tools \
+  net-tools \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ensure default node user has access to /usr/local/share
